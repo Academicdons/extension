@@ -13,20 +13,23 @@ chrome.runtime.onMessage.addListener( async (request, sender, sendResponse) => {
 
     if (type === "NEW") {
         console.log("New tweet: " + tweetID + ' found in section : ' + sectionID + ' with search phrase ' + searchTerm)
-        let data =  {
+        let tweetIDDatta =  {
                 tweetID : tweetID,
-                searchTerm : searchTerm
             }
-        
-        newTweets[sectionID] = data
-        // newTweets.push(data)
+        let searchTermData =  {
+            searchTerm : searchTerm
+        }
+        // newTweets.assign(tweetIDDatta, searchTermData);
+        // newTweets[sectionID] = data
+        newTweets = newTweets
+        newTweets.push(tweetIDDatta, searchTermData)
         let from = 'NotDOM'
         await resetNewTweets (from, tweetID, searchTerm, myUsername )
         sendResponse({ response: "goodbye" });
     }
 });
 
-let createElements = (tweetIdentity,searchTermUsed, myUsername) =>{
+let createElements = async (tweetIdentity,searchTermUsed, myUsername) =>{
 
     newTweetsDiv.style.display = "none";
     tableDiv.style.display = "";
@@ -46,16 +49,16 @@ let createElements = (tweetIdentity,searchTermUsed, myUsername) =>{
 
 
     let searchTermPhrase = colDiv
-    searchTermPhrase.textContent = searchTermUsed
+    searchTermPhrase.textContent = ''
     let viewBut = document.createElement('a')
     let viewButton = document.createElement('button')
     viewButton.className = 'button'
-    viewButton.value = 'Open Tweet'
+    viewButton.value = 
     // viewBut.appendChild(viewButton)
     viewBut.href = 'https://twitter.com/' + myUsername + '/status/'+ tweetIdentity + '/'
     viewBut.className = 'button'
     viewBut.target = "_blank"
-    viewBut.innerHTML = 'Open Tweet'
+    viewBut.innerHTML = 'Search Phrase "' + searchTermUsed + '" '
     let finalViewButton = colDiv.appendChild(viewBut)
 
     
@@ -64,9 +67,10 @@ let createElements = (tweetIdentity,searchTermUsed, myUsername) =>{
     mainDiv.appendChild(containerDiv)
     containerDiv.appendChild(rowDiv)
 
-    let finalDiv = rowDiv.appendChild(searchTermPhrase)
-    finalDiv.appendChild(finalViewButton)
+    let finalDiv = rowDiv.prepend(finalViewButton)
+    // finalDiv.appendChild(finalViewButton)
     removeLastDiv()
+
     
 }
 //adds new row of tweet in the index.html 
@@ -76,56 +80,63 @@ const resetNewTweets = (from, tweetID, searchTerm, myUsername) => {
 
     if(tweetID === undefined){
         console.log('tweetID is undefined')
+ 
+        newTweetsDiv.style.display = "none";
+        tableDiv.style.display = "";
+        errorDiv.style.display = "none";
+
+        //get from chrome storage
+        chrome.storage.sync.get(['key'], function(result) {
+            console.log('Value currently is ' + result.key);
+            newTweets = result.key
+            });
+
         len = newTweets.length;
-        console.log('Saved tweet count is '+ len )
-        if(len>0){
-            newTweetsDiv.style.display = "none";
-            tableDiv.style.display = "";
-            errorDiv.style.display = "none";
+        console.log("Found Chrome Storage to be having a count of " + len)
+        if( len >  0){
             for (let item in newTweets){
                 let tweetIdentity = item.tweetID
                 let searchTermUsed = item.searchTerm
                 createElements(tweetIdentity,searchTermUsed, myUsername )
             }
-        }else{
+        } else {
+            console.log('Database doesnt have anything yet')
             newTweetsDiv.style.display = "";
             tableDiv.style.display = "none";
             errorDiv.style.display = "none";
         }
-        // newTweetsDiv.style.display = "";
-        // tableDiv.style.display = "none";
-        // errorDiv.style.display = "none";
-
+            
+        
     }else{
         createElements(tweetID,searchTerm, myUsername )
     }
 };
 
-const removeLastDiv = () => {
+const removeLastDiv = (tweet) => {
     len = newTweets.length;
+    console.log('In the removeLastDiv newTweets length is :' +  JSON.stringify(newTweets))
+    
     if(len > 5){
-        console.log('len > 5 reducin te no to five')
+        console.log('len > 5 reducing the no to five')
         let idToRemove = newTweets[0].tweetID
-    //     let idToRemove = newTweets[len - len]
-    // Array.prototype.removeByValue = function (val) {
-    //     for (var i = 0; i < this.length; i++) {
-    //       if (this[i] === val) {
-    //         this.splice(i, 1);
-    //         i--;
-    //       }
-    //     }
-    //     return this;
-    //   }
-    delete newTweets[idToRemove]
+        delete newTweets[idToRemove]
+
+        dataDiv.removeChild(dataDiv.getElementsByTagName('li')[0])
     // newTweets.removeByValue(idToRemove);
-    console.log('Id to remove is ' + idToRemove.tweetID)
-    let subsWrapper = document.getElementById(idToRemove.tweetID);
-    subsWrapper.remove();
-    removeLastDiv()
+        // console.log('Id to remove is ' + idToRemove.tweetID)
+        // let subsWrapper = document.getElementById(idToRemove.tweetID);
+        // subsWrapper.remove();
+        removeLastDiv()
     } else{
+        console.log('Saving newTweets ');
+        let value = newTweets
+        chrome.storage.sync.set({key: value}, function() {
+            console.log('Value is set to ' + value);
+        });
         console.log('new tweet count is less than 5 :'+ newTweets)
     }
 }
+
 
 const appendTweets = (tweet) => {
     newTweetsDiv.style.display = "none";

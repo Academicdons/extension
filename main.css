@@ -1,15 +1,35 @@
-.button {
-    background-color: #4CAF50; /* Green */
+
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  li {
+    font: 200 20px/1.5 Helvetica, Verdana, sans-serif;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  li:last-child {
     border: none;
-    color: white;
-    padding: 6px;
-    text-align: center;
+  }
+  
+  li a {
     text-decoration: none;
-    display: inline-block;
-    font-size: 10x;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 4px;
+    color: #000;
+    font-size: 15px;
+    -webkit-transition: font-size 0.3s ease, background-color 0.3s ease;
+    -moz-transition: font-size 0.3s ease, background-color 0.3s ease;
+    -o-transition: font-size 0.3s ease, background-color 0.3s ease;
+    -ms-transition: font-size 0.3s ease, background-color 0.3s ease;
+    transition: font-size 0.3s ease, background-color 0.3s ease;
+    display: block;
+    width: 200px;
+  }
+  
+  li a:hover {
+    font-size: 20px;
+    background: #f6f6f6;
   }
   .dataArea{
     height:200px;
