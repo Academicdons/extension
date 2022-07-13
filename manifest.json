@@ -1,0 +1,43 @@
+{
+    "name": "TweetDeck Assitant",
+    "version": "1.0.0",
+    "description": "New Tweets Panel",
+    "manifest_version": 3,
+    "permissions": ["storage", "webRequest", "tabs", "activeTab"],
+    "host_permissions" : ["https://tweetdeck.twitter.com/"],
+    "background" : {
+        "service_worker" : "background.js",
+        "type": "module"
+    },
+    "content_scripts" : [{
+        "matches" : ["https://tweetdeck.twitter.com/"],
+        "js" : ["contentScript.js"]
+    }  
+    ],
+    "web_accessible_resources":[
+        {
+            "resources":[
+                "/assets/delete.jpg",
+                "/assets/view.png",
+                "manifest.json",
+                "index.html",
+                "main.css",
+                "scripts.js"
+            ],
+            "matches": [
+                "https://tweetdeck.twitter.com/*"
+            ],
+            "use_dynamic_url": true
+        }
+    ],
+    "author": "Kelvin Wangui",
+    "action":{
+        "default_action" : {
+            "14" : "assets/icon.png",
+            "24" : "assets/icon.png",
+            "32" : "assets/icon.png"
+        },
+        "default_title" : "TweetDeck Assitant",
+        "default_popup" : "index.html"
+    }
+}
